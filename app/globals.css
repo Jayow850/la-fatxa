@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-cream text-ink font-sans font-light; }
+h1,h2,h3,h4 { @apply font-serif font-normal; }
+::selection { @apply bg-rose text-white; }
+
+@keyframes floaty { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-14px) rotate(2deg)} }
+@keyframes pulse-dot { 0%{box-shadow:0 0 0 0 rgba(122,46,67,.5)} 70%{box-shadow:0 0 0 9px rgba(122,46,67,0)} 100%{box-shadow:0 0 0 0 rgba(122,46,67,0)} }
+.animate-floaty { animation: floaty 6s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulse-dot 1.5s infinite; }
+
+.btn { @apply inline-flex items-center gap-2 bg-plum text-cream rounded-full px-7 py-3.5 text-xs tracking-[.14em] uppercase transition hover:bg-wine hover:-translate-y-0.5 hover:shadow-lg cursor-pointer; }
+.btn-ghost { @apply bg-transparent text-plum border border-plum hover:bg-plum hover:text-cream; }
+.btn-wa { @apply bg-[#25823f] hover:bg-[#1e6b34]; }
+.chip { @apply border border-linewarm bg-cream text-mutedwarm rounded-full px-5 py-2 text-xs tracking-wide cursor-pointer transition hover:border-wine hover:text-ink; }
+.chip-on { @apply bg-plum text-cream border-plum; }
+
+@keyframes marq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
