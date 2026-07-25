@@ -10,7 +10,7 @@ const badgeText = { new: "New in", best: "Best seller", ltd: "Limited" };
 export default function ProductCard({ p }) {
   const [vi, setVi] = useState(0);
   const v = p.variants[vi] || p.variants[0];
-  const img = v?.image || p.image;
+  const img = v?.image_url || p.image_url;
   return (
     <div className="group bg-cream border border-linewarm rounded-lg overflow-hidden transition hover:-translate-y-2 hover:shadow-2xl hover:shadow-plum/20 relative">
       <Link href={`/product/${p.id}`} className="block aspect-square relative overflow-hidden bg-gradient-to-br from-champagne to-[#DCC0A8]">
