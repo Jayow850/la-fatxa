@@ -128,7 +128,7 @@ export default function Admin() {
       if (e1) return flash("Save failed: " + e1.message);
       await supabase.from("variants").delete().eq("product_id", prod.id);
       const { error: e2 } = await supabase.from("variants").insert(
-        variants.map(v => ({ product_id: prod.id, name: v.name, hex: v.hex, stock: v.stock }))
+        variants.map(v => ({ product_id: prod.id, name: v.name, hex: v.hex, stock: v.stock, image_url: v.image_url || null }))
       );
       if (e2) return flash("Variants failed: " + e2.message);
       flash(`Saved — "${prod.name}" is live (site updates within a minute)`);
@@ -241,7 +241,7 @@ export default function Admin() {
         <div className="grid gap-3">
           {products.map(p => (
             <div key={p.id} className="bg-cream border border-linewarm rounded-xl p-4 flex flex-wrap gap-4 items-center">
-              <div className="w-14 h-14 rounded-lg grid place-items-center text-3xl shrink-0 bg-gradient-to-br from-champagne to-[#DCC0A8]">{p.emoji || "👜"}</div>
+              <div className="w-14 h-14 rounded-lg grid place-items-center text-3xl shrink-0 overflow-hidden bg-gradient-to-br from-champagne to-[#DCC0A8]">{p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" /> : (p.emoji || "👜")}</div>
               <div className="min-w-[170px] flex-1">
                 <div className="font-serif text-lg">{p.name || <em className="text-mutedwarm">Untitled</em>}</div>
                 <div className="text-xs text-mutedwarm">
