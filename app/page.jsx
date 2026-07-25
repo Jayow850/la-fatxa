@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/supabase";
-import { getSettings } from "@/lib/settings";
+import { getSettings, fontCss } from "@/lib/settings";
 
 export const revalidate = 60; // stock refreshes at most every minute
 
@@ -23,7 +23,7 @@ export default async function Home() {
             <div className="text-[.72rem] tracking-[.3em] uppercase text-wine mb-6 flex items-center gap-3">
               <span className="w-9 h-px bg-wine" /> Handcrafted leather · Nairobi
             </div>
-            <h1 className="font-serif font-light text-5xl md:text-7xl leading-[.98]">
+            <h1 className="font-light text-5xl md:text-7xl leading-[.98]" style={{ fontFamily: fontCss(settings.heroFont) }}>
               {settings.heroLine1} <em className="text-wine">{settings.heroEm}</em> {settings.heroLine2}
             </h1>
             <p className="text-mutedwarm mt-7 mb-8 max-w-md text-lg">
