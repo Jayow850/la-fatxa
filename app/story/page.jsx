@@ -1,4 +1,4 @@
-import { getSettings } from "@/lib/settings";
+import { getSettings, fontCss } from "@/lib/settings";
 
 export const revalidate = 60;
 export const metadata = { title: "Our Story — La Fatxa" };
@@ -21,11 +21,11 @@ export default async function Story() {
         </div>
         <div>
           <div className="text-[.72rem] tracking-[.3em] uppercase text-rose mb-3">Our story</div>
-          <h1 className="font-serif font-light text-5xl mb-5">{s.storyTitle}</h1>
+          <h1 className="font-light text-5xl mb-5" style={{ fontFamily: fontCss(s.storyFont) }}>{s.storyTitle}</h1>
           {s.storyText.split("\n").filter(Boolean).map((para, i) => (
             <p key={i} className="text-mutedwarm text-lg mb-4">{para}</p>
           ))}
-          <div className="font-serif italic text-3xl text-wine mt-5">{s.storySig}</div>
+          <div className="italic text-3xl text-wine mt-5" style={{ fontFamily: fontCss(s.storyFont) }}>{s.storySig}</div>
         </div>
       </div>
     </main>
