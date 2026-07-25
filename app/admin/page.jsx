@@ -26,6 +26,55 @@ const emptyProduct = () => ({
   variants: [{ name: "Camel", hex: "#C68C5A", stock: 3 }],
 });
 
+// Curated fonts for the story & hero — kept tasteful so it always looks premium.
+const FONTS = [
+  { id: "serif", label: "Editorial serif (default)", css: "'Fraunces', Georgia, serif" },
+  { id: "script", label: "Elegant handwriting", css: "'Dancing Script', cursive" },
+  { id: "hand", label: "Casual handwritten", css: "'Caveat', cursive" },
+  { id: "sans", label: "Clean & modern", css: "'Jost', system-ui, sans-serif" },
+];
+const fontCss = (id) => (FONTS.find(f => f.id === id) || FONTS[0]).css;
+
+/**
+ * Uploads a chosen photo straight from the phone to the public "bags" bucket,
+ * then calls onDone(publicUrl). Falls back gracefully if Supabase/bucket missing.
+ */
+function ImageUpload({ value, onDone, label = "Choose photo" }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function handle(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!supabase) { setErr("Connect Supabase first"); return; }
+    setBusy(true); setErr("");
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+      const { error } = await supabase.storage.from("bags").upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("bags").getPublicUrl(path);
+      onDone(data.publicUrl);
+    } catch (e2) {
+      setErr(e2.message || "Upload failed — is the 'bags' bucket public?");
+    } finally { setBusy(false); }
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 grid place-items-center bg-gradient-to-br from-champagne to-[#DCC0A8] text-2xl">
+        {value ? <img src={value} alt="" className="w-full h-full object-cover" /> : "🖼️"}
+      </div>
+      <div className="flex-1">
+        <label className="chip cursor-pointer inline-block">
+          {busy ? "Uploading…" : value ? "Change photo" : label}
+          <input type="file" accept="image/*" onChange={handle} className="hidden" disabled={busy} />
+        </label>
+        {value && <button onClick={() => onDone(null)} className="chip !text-wine ml-2">Remove</button>}
+        {err && <div className="text-[.72rem] text-wine mt-1">{err}</div>}
+      </div>
+    </div>
+  );
+}
+
 export default function Admin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -246,8 +295,8 @@ function ProductForm({ initial, onSave, onCancel }) {
 
         <FormCard title="The basics">
           <Field label="Bag name"><input className="inp" value={p.name} onChange={e => set("name", e.target.value)} placeholder="The Nala Tote" /></Field>
-          <Field label="Main photo URL (used when a color has no photo — upload to the 'bags' bucket in Supabase Storage, paste the public URL here)">
-            <input className="inp" value={p.image_url || ""} onChange={e => set("image_url", e.target.value || null)} placeholder="https://…supabase.co/storage/v1/object/public/bags/amara.jpg" />
+          <Field label="Main photo (used when a color has no photo of its own)">
+            <ImageUpload value={p.image_url} onDone={(url) => set("image_url", url)} label="Choose main photo" />
           </Field>
           <Field label="One-line story (shown under the name)"><input className="inp" value={p.subtitle || ""} onChange={e => set("subtitle", e.target.value)} placeholder="The one that goes everywhere with you" /></Field>
           <div className="grid grid-cols-3 gap-3">
@@ -272,18 +321,22 @@ function ProductForm({ initial, onSave, onCancel }) {
         <FormCard title="Colors & stock"
           note="Type ANY color name — Rose Gold, Emerald, Sunset Orange, anything in the world — and pick its exact shade with the swatch. Stock numbers are for your eyes only.">
           {p.variants.map((v, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-2.5 mb-2.5">
-              <input type="color" value={v.hex} onChange={e => setVar(i, "hex", e.target.value)}
-                className="w-11 h-10 rounded-lg border border-linewarm cursor-pointer bg-white p-0.5" title="Pick the exact shade" />
-              <input className="inp" style={{ flex: 1, minWidth: 140 }} value={v.name} onChange={e => setVar(i, "name", e.target.value)} placeholder="Color name — e.g. Rose Gold" />
-              <input className="inp" style={{ flex: 1, minWidth: 160 }} value={v.image_url || ""} onChange={e => setVar(i, "image_url", e.target.value || null)} placeholder="Photo URL for this color (Supabase Storage)" />
-              <div className="flex items-center gap-1.5">
-                <span className="text-[.7rem] text-mutedwarm">Stock</span>
-                <input className="inp" style={{ width: 64, textAlign: "center" }} type="number" min="0" value={v.stock}
-                  onChange={e => setVar(i, "stock", Math.max(0, parseInt(e.target.value) || 0))} />
+            <div key={i} className="border border-linewarm rounded-xl p-3 mb-3 bg-white/40">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <input type="color" value={v.hex} onChange={e => setVar(i, "hex", e.target.value)}
+                  className="w-11 h-10 rounded-lg border border-linewarm cursor-pointer bg-white p-0.5" title="Pick the exact shade" />
+                <input className="inp" style={{ flex: 1, minWidth: 140 }} value={v.name} onChange={e => setVar(i, "name", e.target.value)} placeholder="Color name — e.g. Rose Gold" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[.7rem] text-mutedwarm">Stock</span>
+                  <input className="inp" style={{ width: 64, textAlign: "center" }} type="number" min="0" value={v.stock}
+                    onChange={e => setVar(i, "stock", Math.max(0, parseInt(e.target.value) || 0))} />
+                </div>
+                <button onClick={() => rmVar(i)} disabled={p.variants.length === 1}
+                  className="chip !px-3 !text-wine disabled:opacity-40" title={p.variants.length === 1 ? "Keep at least one color" : "Remove color"}>×</button>
               </div>
-              <button onClick={() => rmVar(i)} disabled={p.variants.length === 1}
-                className="chip !px-3 !text-wine disabled:opacity-40" title={p.variants.length === 1 ? "Keep at least one color" : "Remove color"}>×</button>
+              <div className="mt-2.5">
+                <ImageUpload value={v.image_url} onDone={(url) => setVar(i, "image_url", url)} label={`Photo for ${v.name || "this color"}`} />
+              </div>
             </div>
           ))}
           <button onClick={addVar} className="chip mt-1">+ Add another color</button>
@@ -374,8 +427,14 @@ function SiteEditor({ settings, onSave }) {
         </div>
         <F l="Line 2"><input className="inp" value={s.heroLine2} onChange={e => set("heroLine2", e.target.value)} /></F>
         <F l="Short intro"><textarea className="inp min-h-[60px]" value={s.heroSub} onChange={e => set("heroSub", e.target.value)} /></F>
-        <F l="Hero photo URL (your bag — upload to Supabase Storage, paste the public URL)">
-          <input className="inp" value={s.heroImg || ""} onChange={e => set("heroImg", e.target.value || null)} placeholder="https://…/bags/hero.jpg" />
+        <F l="Hero photo (your signature bag)">
+          <ImageUpload value={s.heroImg} onDone={(url) => set("heroImg", url)} label="Choose hero photo" />
+        </F>
+        <F l="Heading font">
+          <select className="inp" value={s.heroFont || "serif"} onChange={e => set("heroFont", e.target.value)}>
+            {FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+          </select>
+          <div className="mt-2 text-2xl" style={{ fontFamily: fontCss(s.heroFont || "serif") }}>{s.heroLine1} {s.heroEm}</div>
         </F>
       </EditCard>
 
@@ -413,6 +472,12 @@ function SiteEditor({ settings, onSave }) {
             <F l="Title"><input className="inp" value={s.storyTitle} onChange={e => set("storyTitle", e.target.value)} /></F>
             <F l="Your story"><textarea className="inp min-h-[130px]" value={s.storyText} onChange={e => set("storyText", e.target.value)} /></F>
             <F l="Signature"><input className="inp" value={s.storySig} onChange={e => set("storySig", e.target.value)} /></F>
+            <F l="Story font">
+              <select className="inp" value={s.storyFont || "serif"} onChange={e => set("storyFont", e.target.value)}>
+                {FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+              </select>
+              <div className="mt-2 text-xl text-wine" style={{ fontFamily: fontCss(s.storyFont || "serif") }}>{s.storyTitle}</div>
+            </F>
           </>
         )}
       </EditCard>
