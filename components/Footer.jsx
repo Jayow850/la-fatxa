@@ -3,34 +3,38 @@ import { waLink, waGeneralMessage } from "@/lib/wa";
 
 export default function Footer() {
   return (
-    <footer className="bg-plum text-champagne pt-16 pb-7 text-sm">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-10 pb-10 border-b border-champagne/20">
+    <footer className="bg-plum text-champagne pt-10 pb-5 text-sm">
+      <div className="max-w-6xl mx-auto px-5">
+        {/* brand line — compact */}
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="w-8 h-8 rounded-full border border-champagne/70 grid place-items-center font-serif italic text-sm shrink-0">F</span>
+          <span className="font-serif italic text-lg text-cream">La <em>Fatxa</em></span>
+        </div>
+
+        {/* columns side-by-side even on mobile */}
+        <div className="grid grid-cols-3 gap-4 pb-7 border-b border-champagne/20">
           <div>
-            <div className="font-serif italic text-lg text-cream mb-3">La <em>Fatxa</em></div>
-            <p className="opacity-75 max-w-[260px]">Handcrafted full-grain leather bags, made in small batches in Nairobi. Carried for years, not seasons.</p>
-          </div>
-          <div>
-            <h5 className="font-sans uppercase tracking-[.1em] text-[.72rem] mb-4 opacity-70">Shop</h5>
+            <h5 className="font-sans uppercase tracking-[.1em] text-[.62rem] mb-2.5 opacity-60">Shop</h5>
             {["Totes","Crossbody","Clutches","Mini Bags"].map(c => (
-              <Link key={c} href={`/shop?cat=${encodeURIComponent(c)}`} className="block mb-2 opacity-80 hover:opacity-100">{c}</Link>
+              <Link key={c} href={`/shop?cat=${encodeURIComponent(c)}`} className="block mb-1.5 text-[.8rem] opacity-80 hover:opacity-100">{c}</Link>
             ))}
           </div>
           <div>
-            <h5 className="font-sans uppercase tracking-[.1em] text-[.72rem] mb-4 opacity-70">Help</h5>
-            <Link href="/story" className="block mb-2 opacity-80 hover:opacity-100">Our story</Link>
-            <Link href="/faq" className="block mb-2 opacity-80 hover:opacity-100">FAQ</Link>
-            <a href={waLink(waGeneralMessage)} target="_blank" rel="noreferrer" className="block mb-2 opacity-80 hover:opacity-100">WhatsApp us</a>
+            <h5 className="font-sans uppercase tracking-[.1em] text-[.62rem] mb-2.5 opacity-60">Help</h5>
+            <Link href="/story" className="block mb-1.5 text-[.8rem] opacity-80 hover:opacity-100">Our story</Link>
+            <Link href="/faq" className="block mb-1.5 text-[.8rem] opacity-80 hover:opacity-100">FAQ</Link>
+            <a href={waLink(waGeneralMessage)} target="_blank" rel="noreferrer" className="block mb-1.5 text-[.8rem] opacity-80 hover:opacity-100">WhatsApp us</a>
           </div>
           <div>
-            <h5 className="font-sans uppercase tracking-[.1em] text-[.72rem] mb-4 opacity-70">Promise</h5>
-            <span className="block mb-2 opacity-80">14-day free returns</span>
-            <span className="block mb-2 opacity-80">Nairobi 1–2 day delivery</span>
-            <span className="block mb-2 opacity-80">Real leather, always</span>
+            <h5 className="font-sans uppercase tracking-[.1em] text-[.62rem] mb-2.5 opacity-60">Promise</h5>
+            <span className="block mb-1.5 text-[.8rem] opacity-80">14-day returns</span>
+            <span className="block mb-1.5 text-[.8rem] opacity-80">Nairobi 1–2 days</span>
+            <span className="block mb-1.5 text-[.8rem] opacity-80">Real leather</span>
           </div>
         </div>
-        <div className="pt-6 flex flex-wrap justify-between gap-3 opacity-60 text-xs">
-          <span>© {new Date().getFullYear()} La Fatxa. Made with care in Nairobi.</span>
+
+        <div className="pt-4 flex flex-wrap justify-between gap-2 opacity-55 text-[.7rem]">
+          <span>© {new Date().getFullYear()} La Fatxa · Nairobi</span>
           <span>Instagram · TikTok · WhatsApp</span>
         </div>
       </div>

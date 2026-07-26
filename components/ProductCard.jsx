@@ -1,36 +1,79 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import StockBadge from "./StockBadge";
 import { money } from "@/lib/data";
 
-const badgeStyle = { new: "bg-cream text-wine", best: "bg-wine text-white", ltd: "bg-gold text-white" };
 const badgeText = { new: "New in", best: "Best seller", ltd: "Limited" };
+const badgeStyle = {
+  new: "bg-cream/95 text-wine",
+  best: "bg-wine text-white",
+  ltd: "bg-gold text-white",
+};
 
 export default function ProductCard({ p }) {
   const [vi, setVi] = useState(0);
   const v = p.variants[vi] || p.variants[0];
   const img = v?.image_url || p.image_url;
+
+  const inStock = p.variants.filter((x) => x.stock > 0);
+  const low = inStock.some((x) => x.stock <= 2);
+  const soldOut = inStock.length === 0;
+
   return (
-    <div className="group bg-cream border border-linewarm rounded-lg overflow-hidden transition hover:-translate-y-2 hover:shadow-2xl hover:shadow-plum/20 relative">
+    <div className="group bg-white rounded-lg overflow-hidden border border-linewarm/70 transition hover:shadow-lg hover:shadow-plum/10 flex flex-col">
+      {/* IMAGE — fills full width, edge to edge, square (Taobao style) */}
       <Link href={`/product/${p.id}`} className="block aspect-square relative overflow-hidden bg-gradient-to-br from-champagne to-[#DCC0A8]">
-        <div className="w-full h-full grid place-items-center text-6xl sm:text-7xl transition duration-500 group-hover:scale-105">
+        <div className="w-full h-full grid place-items-center text-5xl transition duration-500 group-hover:scale-105">
           {img ? <img src={img} alt={p.name} className="w-full h-full object-cover" /> : p.emoji}
         </div>
-        {p.badge && <div className={`absolute top-3 left-3 text-[.56rem] tracking-[.12em] uppercase px-3 py-1.5 rounded-full font-medium ${badgeStyle[p.badge]}`}>{badgeText[p.badge]}</div>}
+        {p.badge && (
+          <div className={`absolute top-2 left-2 text-[.55rem] tracking-[.08em] uppercase px-2.5 py-1 rounded-full font-medium backdrop-blur ${badgeStyle[p.badge]}`}>
+            {badgeText[p.badge]}
+          </div>
+        )}
+        {soldOut ? (
+          <div className="absolute inset-0 bg-cream/55 grid place-items-center">
+            <span className="font-serif italic text-mutedwarm text-sm">This batch is gone</span>
+          </div>
+        ) : low ? (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-wine/90 text-white text-[.55rem] tracking-wide uppercase px-2 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse-dot" /> Almost gone
+          </div>
+        ) : null}
       </Link>
-      <div className="p-4 sm:p-5">
-        <Link href={`/product/${p.id}`}><h3 className="text-base sm:text-lg leading-tight">{p.name}</h3></Link>
-        <div className="font-serif text-wine text-sm sm:text-base">{money(p.price)}</div>
-        <StockBadge variants={p.variants} />
-        {/* clickable color swatches — swap the image */}
-        <div className="flex gap-1.5 mt-3 flex-wrap">
+
+      {/* INFO BELOW — left-aligned, tight, Taobao style */}
+      <div className="px-2.5 py-2.5 flex flex-col gap-1 flex-1">
+        {/* price first + big, like the reference */}
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-serif text-wine text-lg leading-none">{money(p.price)}</span>
+          {p.was && <span className="text-[.7rem] text-mutedwarm line-through">{money(p.was)}</span>}
+        </div>
+
+        {/* name */}
+        <Link href={`/product/${p.id}`}>
+          <h3 className="text-[.85rem] leading-snug text-ink line-clamp-2">{p.name}</h3>
+        </Link>
+
+        {/* subtitle */}
+        {p.subtitle && <p className="text-[.68rem] text-mutedwarm leading-tight line-clamp-1">{p.subtitle}</p>}
+
+        {/* color dots */}
+        <div className="flex gap-1.5 mt-0.5 flex-wrap items-center">
           {p.variants.map((vv, i) => (
-            <button key={vv.name + i} onClick={() => setVi(i)} title={vv.name}
-              className="w-[17px] h-[17px] rounded-full transition"
-              style={{ background: vv.hex, opacity: vv.stock === 0 ? 0.3 : 1,
-                boxShadow: i === vi ? "0 0 0 2px #FBF5F0, 0 0 0 3.5px #7A2E43" : "0 0 0 1px rgba(0,0,0,.12)" }} />
+            <button
+              key={vv.name + i}
+              onClick={() => setVi(i)}
+              title={vv.stock === 0 ? `${vv.name} - gone` : vv.name}
+              className="w-[15px] h-[15px] rounded-full transition hover:scale-110"
+              style={{
+                background: vv.hex,
+                opacity: vv.stock === 0 ? 0.3 : 1,
+                boxShadow: i === vi ? "0 0 0 1.5px #fff, 0 0 0 3px #7A2E43" : "0 0 0 1px rgba(0,0,0,.12)",
+              }}
+            />
           ))}
+          <span className="text-[.64rem] text-mutedwarm ml-0.5">{v?.name}</span>
         </div>
       </div>
     </div>

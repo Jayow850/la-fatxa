@@ -3,6 +3,7 @@ import { useState } from "react";
 import { money, stockState } from "@/lib/data";
 import { waLink, waOrderMessage } from "@/lib/wa";
 import SizeTool from "@/components/SizeTool";
+import Reviews from "@/components/Reviews";
 
 const badgeText = { new: "New in", best: "Best seller", ltd: "Almost gone" };
 
@@ -34,21 +35,20 @@ export default function PDPClient({ product: p, allProducts }) {
               </div>
             )}
           </div>
-          <div className="flex gap-2.5 mt-3.5">
-            {["front", "side", "inside", "detail"].map((t, i) => (
-              <div key={t} title={t}
-                className={`w-16 h-16 rounded-md grid place-items-center text-2xl cursor-pointer bg-gradient-to-br from-champagne to-[#DCC0A8] border-[1.5px] ${i === 0 ? "border-wine" : "border-transparent"}`}>
-                {p.emoji}
-              </div>
+          <div className="flex gap-2.5 mt-3.5 flex-wrap">
+            {p.variants.map((vv, i) => (
+              <button key={vv.name + i} onClick={() => setVi(i)} title={vv.name}
+                className={`w-16 h-16 rounded-md overflow-hidden grid place-items-center text-2xl cursor-pointer bg-gradient-to-br from-champagne to-[#DCC0A8] border-[1.5px] ${i === vi ? "border-wine" : "border-transparent"}`}>
+                {(vv.image_url || p.image_url)
+                  ? <img src={vv.image_url || p.image_url} alt={vv.name} className="w-full h-full object-cover" />
+                  : p.emoji}
+              </button>
             ))}
           </div>
         </div>
 
         {/* INFO */}
         <div>
-          <div className="flex items-center gap-2 text-sm text-mutedwarm mb-1.5">
-            <span className="text-gold tracking-[2px]">★★★★★</span> {p.rating} · {p.revs} reviews
-          </div>
           <h1 className="font-serif font-light text-4xl">{p.name}</h1>
           <div className="text-mutedwarm mt-1">{p.subtitle}</div>
           <div className="font-serif text-2xl text-wine my-3.5">
@@ -105,6 +105,11 @@ export default function PDPClient({ product: p, allProducts }) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* REVIEWS */}
+      <div className="max-w-3xl mx-auto px-6 mt-4">
+        <Reviews productId={p.id} />
       </div>
 
       {/* STICKY ORDER BAR */}

@@ -13,11 +13,17 @@ export default async function Story() {
   return (
     <main className="pt-28 pb-24">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-14 items-center">
-        <div className="aspect-[4/5] rounded-[8px_8px_160px_8px] grid place-items-center text-8xl relative bg-gradient-to-br from-rose to-wine shadow-2xl shadow-plum/40">
-          👜
-          <div className="absolute bottom-6 right-6 w-24 h-24 border border-white/50 rounded-full grid place-items-center text-center font-serif italic text-xs text-white leading-tight -rotate-6">
-            La Fatxa<br />by hand
-          </div>
+        <div className="aspect-[4/5] rounded-[8px_8px_160px_8px] grid place-items-center text-8xl relative overflow-hidden bg-gradient-to-br from-rose to-wine shadow-2xl shadow-plum/40">
+          {s.storyImage
+            ? <img src={s.storyImage} alt="La Fatxa" className="absolute inset-0 w-full h-full object-cover" />
+            : <span>{s.storyEmoji || "👜"}</span>}
+          {s.storyBadge !== "" && (
+            <div className="absolute bottom-6 right-6 w-24 h-24 border border-white/50 rounded-full grid place-items-center text-center font-serif italic text-xs text-white leading-tight -rotate-6 backdrop-blur-sm bg-black/5">
+              {(s.storyBadge || "La Fatxa · by hand").split("·").map((line, i) => (
+                <span key={i} className="block">{line.trim()}</span>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <div className="text-[.72rem] tracking-[.3em] uppercase text-rose mb-3">Our story</div>

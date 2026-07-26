@@ -472,6 +472,12 @@ function SiteEditor({ settings, onSave }) {
             <F l="Title"><input className="inp" value={s.storyTitle} onChange={e => set("storyTitle", e.target.value)} /></F>
             <F l="Your story"><textarea className="inp min-h-[130px]" value={s.storyText} onChange={e => set("storyText", e.target.value)} /></F>
             <F l="Signature"><input className="inp" value={s.storySig} onChange={e => set("storySig", e.target.value)} /></F>
+            <F l="Story photo">
+              <ImageUpload value={s.storyImage} onDone={(url) => set("storyImage", url)} label="Choose story photo" />
+            </F>
+            <F l='Round badge text (use "·" to split into two lines — leave empty to hide)'>
+              <input className="inp" value={s.storyBadge ?? "La Fatxa · by hand"} onChange={e => set("storyBadge", e.target.value)} placeholder="La Fatxa · by hand" />
+            </F>
             <F l="Story font">
               <select className="inp" value={s.storyFont || "serif"} onChange={e => set("storyFont", e.target.value)}>
                 {FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}

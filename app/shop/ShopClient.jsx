@@ -37,7 +37,7 @@ export default function ShopClient({ products }) {
             <button key={pr} onClick={() => setPrice(pr)} className={`chip !text-[.7rem] ${price === pr ? "chip-on" : ""}`}>{pr}</button>
           ))}
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-7">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
           {shown.map(p => <ProductCard key={p.id} p={p} />)}
         </div>
         {!shown.length && <p className="text-center text-mutedwarm py-16">No bags match those filters — try widening them.</p>}

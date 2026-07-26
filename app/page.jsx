@@ -57,7 +57,7 @@ export default async function Home() {
           <div className="text-center text-[.72rem] tracking-[.3em] uppercase text-rose mb-3">Just landed</div>
           <h2 className="text-center font-serif font-light text-4xl mb-3">New <em className="text-wine">arrivals</em></h2>
           <p className="text-center text-mutedwarm max-w-lg mx-auto mb-12">Small batches. When they're gone, they're gone.</p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-7">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
             {newIn.map(p => <ProductCard key={p.id} p={p} />)}
           </div>
         </div>
@@ -69,7 +69,7 @@ export default async function Home() {
           <div className="text-center text-[.72rem] tracking-[.3em] uppercase text-rose mb-3">Proven favorites</div>
           <h2 className="text-center font-serif font-light text-4xl mb-3">Best <em className="text-wine">sellers</em></h2>
           <p className="text-center text-mutedwarm max-w-lg mx-auto mb-12">The bags our customers come back for — and buy again as gifts.</p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-7">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
             {best.map(p => <ProductCard key={p.id} p={p} />)}
           </div>
           <div className="text-center mt-12">
