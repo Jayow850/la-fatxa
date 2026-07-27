@@ -2,6 +2,7 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/supabase";
 import { getSettings, fontCss } from "@/lib/settings";
+import { waLink, waVipMessage } from "@/lib/wa";
 
 export const revalidate = 60; // stock refreshes at most every minute
 
@@ -83,12 +84,12 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-[.72rem] tracking-[.3em] uppercase text-rose mb-3">First look</div>
           <h2 className="font-serif font-light text-4xl mb-3">New drops <em className="text-wine">sell out fast</em></h2>
-          <p className="text-mutedwarm">Get them before they hit the shop. No spam, only the good stuff.</p>
-          <form className="flex max-w-md mx-auto mt-7 bg-cream border border-linewarm rounded-full p-1.5 shadow-lg">
-            <input type="email" required placeholder="your@email.com"
-              className="flex-1 px-5 py-3 bg-transparent focus:outline-none text-sm" />
-            <button type="submit" className="btn !px-6 !py-3">Notify me</button>
-          </form>
+          <p className="text-mutedwarm max-w-md mx-auto">Join the VIP list on WhatsApp and get first look at every new batch — before it hits the shop.</p>
+          <a href={waLink(waVipMessage)} target="_blank" rel="noreferrer"
+            className="btn btn-wa !px-7 !py-4 mt-7 inline-flex">
+            💬 Join the VIP list on WhatsApp
+          </a>
+          <p className="text-[.75rem] text-mutedwarm mt-4">One message and you're in. No spam — only new drops.</p>
         </div>
       </section>
     </main>
