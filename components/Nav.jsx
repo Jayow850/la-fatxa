@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { waLink, waGeneralMessage } from "@/lib/wa";
+import { useFavorites } from "@/lib/favorites";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const { count } = useFavorites();
   useEffect(() => {
     const f = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", f);
@@ -23,7 +25,13 @@ export default function Nav() {
           <Link href="/story" className="opacity-75 hover:opacity-100">Our Story</Link>
           <Link href="/faq" className="opacity-75 hover:opacity-100">FAQ</Link>
         </nav>
-        <a href={waLink(waGeneralMessage)} target="_blank" rel="noreferrer" className="btn !px-5 !py-2.5">Order on WhatsApp</a>
+        <div className="flex items-center gap-3">
+          <Link href="/favorites" className="flex items-center gap-1.5 text-sm" title="Your favorites">
+            <span style={{ color: count ? "#C8798A" : "inherit" }}>{count ? "♥" : "♡"}</span>
+            {count > 0 && <span className="text-[.8rem]">{count}</span>}
+          </Link>
+          <a href={waLink(waGeneralMessage)} target="_blank" rel="noreferrer" className="btn !px-5 !py-2.5">Order on WhatsApp</a>
+        </div>
       </div>
     </header>
   );

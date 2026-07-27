@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, getAllReviews, approveReview, deleteReview } from "@/lib/supabase";
 import { seedProducts } from "@/lib/data";
 import { defaultSettings, getSettings, saveSettings } from "@/lib/settings";
 
@@ -201,12 +201,13 @@ export default function Admin() {
           <div className="flex gap-2">
             <button onClick={() => setTab("collection")} className={`chip ${tab === "collection" ? "chip-on" : ""}`}>Collection</button>
             <button onClick={() => setTab("site")} className={`chip ${tab === "site" ? "chip-on" : ""}`}>My site</button>
+            <button onClick={() => setTab("reviews")} className={`chip ${tab === "reviews" ? "chip-on" : ""}`}>Reviews</button>
             <button onClick={() => setEditing(emptyProduct())} className="btn !bg-wine !py-2.5">+ New bag</button>
           </div>
         </div>
 
         {tab === "site" && <SiteEditor settings={settings} onSave={persistSettings} />}
-        {tab === "site" ? null : null}
+        {tab === "reviews" && <ReviewsManager demo={demo} flash={flash} />}
 
         {tab === "collection" && (<>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-8">
@@ -522,6 +523,76 @@ function F({ l, children }) {
     <div className="mb-3">
       <label className="block text-[.68rem] tracking-[.1em] uppercase text-mutedwarm mb-1.5">{l}</label>
       {children}
+    </div>
+  );
+}
+
+/* ---- FATXA'S REVIEW APPROVAL ---- */
+function ReviewsManager({ demo, flash }) {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    setLoading(true);
+    const r = await getAllReviews();
+    setReviews(r);
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []);
+
+  async function approve(id) {
+    const res = await approveReview(id);
+    if (res.ok) { flash("Approved — now visible on the bag"); load(); }
+    else flash("Couldn't approve: " + (res.error || ""));
+  }
+  async function remove(id) {
+    if (!window.confirm("Delete this review permanently?")) return;
+    const res = await deleteReview(id);
+    if (res.ok) { flash("Deleted"); load(); }
+    else flash("Couldn't delete: " + (res.error || ""));
+  }
+
+  const pending = reviews.filter((r) => !r.approved);
+  const approved = reviews.filter((r) => r.approved);
+
+  if (demo) return <p className="text-mutedwarm text-sm">Reviews live once Supabase is connected and you're signed in.</p>;
+  if (loading) return <p className="text-mutedwarm text-sm">Loading reviews…</p>;
+
+  const Row = ({ r }) => (
+    <div className="bg-cream border border-linewarm rounded-xl p-4 mb-2.5">
+      <div className="flex justify-between items-start gap-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-[.92rem]">{r.name}</span>
+            <span className="text-gold text-sm">{"★".repeat(r.rating)}<span className="text-linewarm">{"★".repeat(5 - r.rating)}</span></span>
+          </div>
+          <div className="text-[.72rem] text-mutedwarm mb-1.5">on {r.products?.name || r.product_id}</div>
+          <p className="text-sm text-mutedwarm">{r.body}</p>
+        </div>
+        <div className="flex flex-col gap-2 shrink-0">
+          {!r.approved && <button onClick={() => approve(r.id)} className="chip !bg-[#25823f] !text-white !border-[#25823f]">Approve</button>}
+          <button onClick={() => remove(r.id)} className="chip !text-wine">Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 className="font-serif font-light text-2xl mb-1">Reviews</h2>
+      <p className="text-mutedwarm text-sm mb-6">Approve the ones you're happy to show. Customers only ever see approved reviews.</p>
+
+      <h3 className="font-sans uppercase tracking-[.1em] text-[.7rem] text-mutedwarm mb-3">
+        Waiting for you {pending.length > 0 && `(${pending.length})`}
+      </h3>
+      {pending.length === 0 ? <p className="text-mutedwarm text-sm mb-8">Nothing waiting right now.</p>
+        : <div className="mb-8">{pending.map((r) => <Row key={r.id} r={r} />)}</div>}
+
+      <h3 className="font-sans uppercase tracking-[.1em] text-[.7rem] text-mutedwarm mb-3">
+        Live on the site {approved.length > 0 && `(${approved.length})`}
+      </h3>
+      {approved.length === 0 ? <p className="text-mutedwarm text-sm">No approved reviews yet.</p>
+        : approved.map((r) => <Row key={r.id} r={r} />)}
     </div>
   );
 }

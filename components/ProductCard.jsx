@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { money } from "@/lib/data";
+import { useFavorites } from "@/lib/favorites";
 
 const badgeText = { new: "New in", best: "Best seller", ltd: "Limited" };
 const badgeStyle = {
@@ -12,6 +13,8 @@ const badgeStyle = {
 
 export default function ProductCard({ p }) {
   const [vi, setVi] = useState(0);
+  const { has, toggle } = useFavorites();
+  const wished = has(p.id);
   const v = p.variants[vi] || p.variants[0];
   const img = v?.image_url || p.image_url;
 
@@ -31,6 +34,14 @@ export default function ProductCard({ p }) {
             {badgeText[p.badge]}
           </div>
         )}
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(p.id); }}
+          title={wished ? "Remove from favorites" : "Save to favorites"}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full grid place-items-center text-[.85rem] backdrop-blur transition"
+          style={{ background: wished ? "#C8798A" : "rgba(251,245,240,.85)", color: wished ? "#fff" : "#241A1C" }}
+        >
+          {wished ? "♥" : "♡"}
+        </button>
         {soldOut ? (
           <div className="absolute inset-0 bg-cream/55 grid place-items-center">
             <span className="font-serif italic text-mutedwarm text-sm">This batch is gone</span>
